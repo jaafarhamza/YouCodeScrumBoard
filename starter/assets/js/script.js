@@ -33,7 +33,7 @@ function closeModal() {
 
 //save
 
-function saveTask() {
+function savee() {
   let title = document.getElementById('task-title').value;
   let typeElement = document.querySelector('input[name="task-type"]:checked');
   let priority = document.getElementById('task-priority').value;
@@ -182,7 +182,7 @@ window.onload = function () {
   tasks.forEach((task) => showElement(task));
 };
 
-document.getElementById('task-save-btn').onclick = saveTask;
+
 
 // count
 
