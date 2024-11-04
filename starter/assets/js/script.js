@@ -6,6 +6,8 @@ function addButton() {
   deletee.style.display = 'none';
   let update = document.getElementById('task-update-btn');
   update.style.display = 'none';
+  document.getElementById('task-save-btn').style.display = 'inline-block';
+  clearModalFields();
 }
 
 function cancelButton() {
@@ -35,17 +37,21 @@ function closeModal() {
 function saveTask() {
 
   let title = document.getElementById('task-title').value;
-  let TASKElement = document.querySelector('input[name="task-type"]:checked');
+  let typeElement = document.querySelector('input[name="task-type"]:checked');
   let priority = document.getElementById('task-priority').value;
   let status = document.getElementById('task-status').value;
   let date = document.getElementById('task-date').value;
   let description = document.getElementById('task-description').value;
 
-  if (!title || !TASKElement || !priority || !status || !date || !description) {
+  if (!title || !typeElement || !priority || !status || !date || !description) {
+    Swal.fire({
+      icon: "error",
+      text: "please entry your  task details",
+    });
       return;
   }
 
-  let TASK = TASKElement.value;
+  let TASK = typeElement.value;
   let task = { title, TASK, priority, status, date, description };
 
   let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -71,12 +77,12 @@ function saveTask() {
 
 function displayTask(task) {                                
 
-  let taskDiv = document.createElement('a');
-  taskDiv.classList = "list-group-item list-group-item-action d-flex";
-  taskDiv.href = "#";
-  taskDiv.onclick = () => openTaskModal(task);
+  let taskcreate = document.createElement('a');
+  taskcreate.classList = "list-group-item list-group-item-action d-flex";
+  taskcreate.href = "#";
+  taskcreate.onclick = () => openTaskModal(task);
 
-  taskDiv.innerHTML = `
+  taskcreate.innerHTML = `
       <div class="flex-fill">
           <div class="fs-14px lh-12 mb-2px fw-bold text-dark">${task.title}</div>
           <div class="mb-1 fs-12px text-gray-600">${task.description}</div>
@@ -89,12 +95,12 @@ function displayTask(task) {
   `;
 
   // Append the task to the appropriate section
-  let sectionId = task.status === "To Do" ? 'toDo' :
+  let taskcontent = task.status === "To Do" ? 'toDo' :
                   task.status === "In Progress" ? 'in-Progress' :
                   task.status === "Done" ? 'Done' : null;
 
-  if (sectionId) {
-      document.getElementById(sectionId).appendChild(taskDiv);
+  if (taskcontent) {
+      document.getElementById(taskcontent).appendChild(taskcreate);
   } else {
     
   }
@@ -148,6 +154,7 @@ function updateTask(originalTask) {
       document.getElementById('form-task').reset();
       location.reload(); 
 
+
       
       Swal.fire("Saved!", "", "success");
 
@@ -189,6 +196,7 @@ function deleteTask(task) {
       });
     }
   });
+  
 }
 
 window.onload = function() {
@@ -199,5 +207,25 @@ window.onload = function() {
 
 document.getElementById('task-save-btn').onclick = saveTask;
 
+// count
+
+function count() {
+
+  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+  let toDoCount = tasks.filter(task => task.status === "To Do").length;
+  let inProgressCount = tasks.filter(task => task.status === "In Progress").length;
+  let doneCount = tasks.filter(task => task.status === "Done").length;
+
+  document.getElementById('to-do-tasks-count').textContent = toDoCount;
+  document.getElementById('in-progress-tasks-count').textContent = inProgressCount;
+  document.getElementById('done-tasks-count').textContent = doneCount;
+}
+
+window.onload = function() {
+  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  tasks.forEach(task => displayTask(task));
+  count();
+};
 
 
