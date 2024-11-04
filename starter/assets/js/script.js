@@ -1,4 +1,3 @@
-
 function addButton() {
   let form = document.getElementById('modal-task');
   form.style.display = 'block';
@@ -7,7 +6,7 @@ function addButton() {
   let update = document.getElementById('task-update-btn');
   update.style.display = 'none';
   document.getElementById('task-save-btn').style.display = 'inline-block';
-  clearModalFields();
+  clearModal();
 }
 
 function cancelButton() {
@@ -15,9 +14,9 @@ function cancelButton() {
   form.style.display = 'none';
 }
 
-                                           //  modal 
+//  modal
 
-function clearModalFields() {
+function clearModal() {
   document.getElementById('task-title').value = '';
   document.querySelector('input[name="task-type"]:checked').checked = false;
   document.getElementById('task-priority').value = '';
@@ -26,16 +25,15 @@ function clearModalFields() {
   document.getElementById('task-description').value = '';
 }
 
-                                           // close modal
+// close modal
 
 function closeModal() {
-  document.getElementById('modal-task').style.display = 'none'; // Hide modal
+  document.getElementById('modal-task').style.display = 'none';
 }
 
-                                            //save 
+//save
 
 function saveTask() {
-
   let title = document.getElementById('task-title').value;
   let typeElement = document.querySelector('input[name="task-type"]:checked');
   let priority = document.getElementById('task-priority').value;
@@ -45,41 +43,38 @@ function saveTask() {
 
   if (!title || !typeElement || !priority || !status || !date || !description) {
     Swal.fire({
-      icon: "error",
-      text: "please entry your  task details",
+      icon: 'error',
+      text: 'please entry your  task details',
     });
-      return;
+    return;
   }
 
   let TASK = typeElement.value;
   let task = { title, TASK, priority, status, date, description };
 
-  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  let tasks = JSON.parse(localStorage.getItem('tasks'));
   tasks.push(task);
   localStorage.setItem('tasks', JSON.stringify(tasks));
 
-  displayTask(task);
+  showElement(task);
   closeModal();
   document.getElementById('form-task').reset();
 
-                                                         //success message  "sweet alert"
   Swal.fire({
-    position: "center",
-    icon: "success",
-    title: "Your task has been saved",
+    position: 'center',
+    icon: 'success',
+    title: 'Your task has been saved',
     showConfirmButton: false,
-    timer: 1500
+    timer: 1500,
   });
+  count();
 }
 
+// task element
 
-                                                  // task element
-
-function displayTask(task) {                                
-
+function showElement(task) {
   let taskcreate = document.createElement('a');
-  taskcreate.classList = "list-group-item list-group-item-action d-flex";
-  taskcreate.href = "#";
+  taskcreate.classList = 'list-group-item list-group-item-action d-grid';
   taskcreate.onclick = () => openTaskModal(task);
 
   taskcreate.innerHTML = `
@@ -94,23 +89,27 @@ function displayTask(task) {
       </div>
   `;
 
-  // Append the task to the appropriate section
-  let taskcontent = task.status === "To Do" ? 'toDo' :
-                  task.status === "In Progress" ? 'in-Progress' :
-                  task.status === "Done" ? 'Done' : null;
+  let taskcontent =
+    task.status === 'To Do'
+      ? 'toDo'
+      : task.status === 'In Progress'
+      ? 'in-Progress'
+      : task.status === 'Done'
+      ? 'Done'
+      : null;
 
   if (taskcontent) {
-      document.getElementById(taskcontent).appendChild(taskcreate);
-  } else {
-    
+    document.getElementById(taskcontent).appendChild(taskcreate);
   }
 }
 
-                                                       // update
+// update
 
 function openTaskModal(task) {
   document.getElementById('task-title').value = task.title;
-  document.querySelector(`input[name="task-type"][value="${task.TASK}"]`).checked = true;
+  document.querySelector(
+    `input[name="task-type"][value="${task.TASK}"]`
+  ).checked = true;
   document.getElementById('task-priority').value = task.priority;
   document.getElementById('task-status').value = task.status;
   document.getElementById('task-date').value = task.date;
@@ -126,106 +125,84 @@ function openTaskModal(task) {
   document.getElementById('modal-task').style.display = 'block';
 }
 
-
 function updateTask(originalTask) {
-
   Swal.fire({
-    title: "Do you want to save the update?",
+    title: 'Do you want to save the update?',
     showDenyButton: true,
     showCancelButton: true,
-    confirmButtonText: "Save",
-    denyButtonText: `Don't save`
+    confirmButtonText: 'Save',
+    denyButtonText: `Don't save`,
   }).then((result) => {
     if (result.isConfirmed) {
       let title = document.getElementById('task-title').value;
-      let TASK = document.querySelector('input[name="task-type"]:checked').value;
+      let TASK = document.querySelector(
+        'input[name="task-type"]:checked'
+      ).value;
       let priority = document.getElementById('task-priority').value;
       let status = document.getElementById('task-status').value;
       let date = document.getElementById('task-date').value;
       let description = document.getElementById('task-description').value;
 
       let tasks = JSON.parse(localStorage.getItem('tasks'));
-      let taskIndex = tasks.findIndex(t => t.title === originalTask.title && t.date === originalTask.date);
+      let taskIndex = tasks.findIndex(
+        (t) => t.title === originalTask.title && t.date === originalTask.date
+      );
       tasks[taskIndex] = { title, TASK, priority, status, date, description };
       localStorage.setItem('tasks', JSON.stringify(tasks));
 
-     
       closeModal();
       document.getElementById('form-task').reset();
-      location.reload(); 
-
-
-      
-      Swal.fire("Saved!", "", "success");
-
+      location.reload();
     } else if (result.isDenied) {
-      Swal.fire("Changes are not saved", "", "info");
-      
+      closeModal();
+      document.getElementById('form-task').reset();
+      location.reload();
     }
-    
   });
+  count();
 }
 
-                                                       // Delete 
+// Delete
 
 function deleteTask(task) {
-  
-  Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it!"
-  }).then((result) => {
-    if (result.isConfirmed) {
-      
-      let tasks = JSON.parse(localStorage.getItem('tasks'));
-      tasks = tasks.filter(t => t.title !== task.title || t.date !== task.date);
-      localStorage.setItem('tasks', JSON.stringify(tasks));
+  let tasks = JSON.parse(localStorage.getItem('tasks'));
+  tasks = tasks.filter((t) => t.title !== task.title || t.date !== task.date);
+  localStorage.setItem('tasks', JSON.stringify(tasks));
 
+  
       closeModal();
       document.getElementById('form-task').reset();
-      location.reload(); 
+      location.reload();
 
-      Swal.fire({
-        title: "Deleted!",
-        text: "Your task has been deleted.",
-        icon: "success",
-      });
-    }
-  });
-  
+  count();
 }
 
-window.onload = function() {
+window.onload = function () {
   let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-  tasks.forEach(task => displayTask(task));
+  tasks.forEach((task) => showElement(task));
 };
-
 
 document.getElementById('task-save-btn').onclick = saveTask;
 
 // count
 
 function count() {
+  let tasks = JSON.parse(localStorage.getItem('tasks'));
 
-  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-
-  let toDoCount = tasks.filter(task => task.status === "To Do").length;
-  let inProgressCount = tasks.filter(task => task.status === "In Progress").length;
-  let doneCount = tasks.filter(task => task.status === "Done").length;
+  let toDoCount = tasks.filter((task) => task.status === 'To Do').length;
+  let inProgressCount = tasks.filter(
+    (task) => task.status === 'In Progress'
+  ).length;
+  let doneCount = tasks.filter((task) => task.status === 'Done').length;
 
   document.getElementById('to-do-tasks-count').textContent = toDoCount;
-  document.getElementById('in-progress-tasks-count').textContent = inProgressCount;
+  document.getElementById('in-progress-tasks-count').textContent =
+    inProgressCount;
   document.getElementById('done-tasks-count').textContent = doneCount;
 }
 
-window.onload = function() {
+window.onload = function () {
   let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-  tasks.forEach(task => displayTask(task));
+  tasks.forEach((task) => showElement(task));
   count();
 };
-
-
