@@ -52,7 +52,7 @@ function savee() {
   let TASK = typeElement.value;
   let task = { title, TASK, priority, status, date, description };
 
-  let tasks = JSON.parse(localStorage.getItem('tasks'));
+  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
   tasks.push(task);
   localStorage.setItem('tasks', JSON.stringify(tasks));
 
